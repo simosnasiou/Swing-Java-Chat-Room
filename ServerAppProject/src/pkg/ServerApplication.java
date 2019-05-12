@@ -2,7 +2,9 @@ package pkg;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -13,11 +15,12 @@ import java.util.Scanner;
 import java.util.Set;
 import javax.swing.Timer;
 
+/**
+ * This will be the Chat Server console application hosted in some pc it's role
+ * is to broadcast the messages to all the clients
+ */
+
 public class ServerApplication {
-	/**
-	 * This will be the Chat Server console application hosted in some pc it's role
-	 * is to broadcast the messages to all the clients
-	 */
 
 	// Set of print writers used to write messages to every client
 	private static Set<PrintWriter> client_writers = new HashSet<>();
@@ -33,6 +36,7 @@ public class ServerApplication {
 
 		// input (reading of this client's messages to the server)
 		private Scanner input;
+		private BufferedReader input2;
 
 		// Constructor - pass the socket for this connection
 		public ClientHandler(Socket socket) {
@@ -48,6 +52,8 @@ public class ServerApplication {
 				output = new PrintWriter(socket.getOutputStream(), true);
 				input = new Scanner(socket.getInputStream());
 
+				input2 = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+
 				// add this one to the printing set
 				client_writers.add(output);
 
@@ -55,17 +61,22 @@ public class ServerApplication {
 				// from while true to someting else
 				ActionListener sendStuff = new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						//System.out.print(input.nextLine());
-						if (true) {
-							//String received_msg = input.nextLine();
-							//output.println(received_msg);
-							output.println("so cold\n");
+						// System.out.print(input.nextLine());
+						try {
+							if (input2.ready()) {
+								// String received_msg = input.nextLine();
+								// output.println(received_msg);
+								output.println("so cold\n");
+								output.println(input2.readLine());
+							}
+
+						} catch (IOException e) {
+							System.out.print(e.getMessage());
 						}
 					}
 				};
 				Timer tt = new Timer(500, sendStuff);
 				tt.start();
-
 			} catch (Exception e) {
 				System.out.println("Some exception: " + e.getMessage());
 			} finally {
