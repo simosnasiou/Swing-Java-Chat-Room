@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.net.Socket;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.swing.JFrame;
@@ -14,8 +15,6 @@ import javax.swing.Timer;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JTextField;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 
 public class MainClientWidnow {
 	/**
@@ -23,12 +22,11 @@ public class MainClientWidnow {
 	 */
 	private JFrame chatFrame;
 	private JTextArea textArea;
-	private Timer timer;
+	private Timer chatUpdater;
 	private JScrollPane scrollPane;
-	private JButton send_btn;
-	private JTextField send_field;
+	private JButton sendBtn;
+	private JTextField sendField;
 
-	private int i;
 	/**
 	 * Server communication objects
 	 */
@@ -48,6 +46,7 @@ public class MainClientWidnow {
 	 * Initialize the contents of the frame.
 	 */
 	private void initialize() {
+		// initialize the components
 		chatFrame = new JFrame();
 		chatFrame.setTitle("ChatWindow");
 		chatFrame.setBounds(100, 100, 450, 321);
@@ -65,15 +64,14 @@ public class MainClientWidnow {
 		scrollPane.setBounds(10, 11, 400, 217);
 		chatFrame.getContentPane().add(scrollPane);
 
-		send_btn = new JButton("Send");
-		send_btn.setBounds(321, 239, 89, 23);
-		chatFrame.getContentPane().add(send_btn);
+		sendBtn = new JButton("Send");
+		sendBtn.setBounds(321, 239, 89, 23);
+		chatFrame.getContentPane().add(sendBtn);
 
-		send_field = new JTextField();
-		send_field.setBounds(10, 240, 301, 20);
-		chatFrame.getContentPane().add(send_field);
-		send_field.setColumns(10);
-
+		sendField = new JTextField();
+		sendField.setBounds(10, 240, 301, 20);
+		chatFrame.getContentPane().add(sendField);
+		sendField.setColumns(10);
 	}
 
 	/**
@@ -89,22 +87,50 @@ public class MainClientWidnow {
 		}
 	}
 
+	// overloading with arguments
+	public void initializeConnection(String serverIP, int socketNumber) {
+		try {
+			this.socket = new Socket(serverIP, socketNumber);
+			input = new Scanner(socket.getInputStream());
+			output = new PrintWriter(socket.getOutputStream(), true);
+		} catch (Exception e) {
+			// exile do someting!
+		}
+	}
+
 	/**
-	 * The regular function of the client after the initialization
+	 * The regular function of the client after the initialization Must always run
+	 * after initialization
 	 */
 	public void runRoutine() {
-
-		// buton click funciton
-		send_btn.addActionListener(new ActionListener() {
+		// button click function send msg clear fields etc
+		sendBtn.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				output.println(send_field.getText());
-				textArea.setText(send_field.getText());
-				send_field.setText("");
+				output.println(sendField.getText());
+				sendField.setText("");
 			}
 		});
 
-		// Regularly updating the chat field - but other tests for now
+		// Timer function to update the chat regularly
+		ActionListener updateChat = new ActionListener() {
+			public void actionPerformed(ActionEvent evt) {
+				try {
+					int inputSize = socket.getInputStream().available();// not blocking
+					if (inputSize != 0) {
+						String receivedText = input.nextLine();
+						textArea.append(receivedText);
+					}
+				} catch (NoSuchElementException | IOException ex) {
+					System.out.println("No more client input");
+				}
+			}
+
+		};
+
+		chatUpdater = new Timer(500, updateChat);
+		chatUpdater.start();
+
 	}
 
 	/**
@@ -120,7 +146,6 @@ public class MainClientWidnow {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
-
 			}
 		});
 	}

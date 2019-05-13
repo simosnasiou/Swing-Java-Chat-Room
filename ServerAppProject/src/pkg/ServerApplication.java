@@ -22,7 +22,7 @@ import javax.swing.Timer;
 public class ServerApplication {
 
 	// Set of print writers used to write messages to every client
-	private static Set<PrintWriter> client_writers = new HashSet<>();
+	private static Set<PrintWriter> clientWriters = new HashSet<>();
 
 	// the class for client hanlder invoked in seperate threads for every client
 	public static class ClientHandler implements Runnable {
@@ -54,16 +54,18 @@ public class ServerApplication {
 				input = new Scanner(socket.getInputStream());
 
 				// add this one to the printing set
-				client_writers.add(output);
+				clientWriters.add(output);
 
 				// repeatedly check for messages and rebroadcast - change the implementation
 				ActionListener sendStuff = new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
 						try {
-							int x = socket.getInputStream().available();//not blocking
-							if (x != 0) {
-								String ss = input.nextLine();
-								System.out.println(ss);
+							int inputSize = socket.getInputStream().available();//not blocking
+							if (inputSize != 0) {
+								String receivedText = input.nextLine();
+								for (PrintWriter writer : clientWriters ) {
+									writer.println(receivedText);
+								}
 							}
 						} catch (NoSuchElementException | IOException ex) {
 							System.out.println("No more client input");
