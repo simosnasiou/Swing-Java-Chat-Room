@@ -12,8 +12,8 @@ import javax.swing.Timer;
 
 /**
  * 
- * @author pope_
- *This is the class that the server uses to handle each client in a separate thread
+ * @author pope_ This is the class that the server uses to handle each client in
+ *         a separate thread
  */
 public class ClientHandler implements Runnable {
 
@@ -69,14 +69,8 @@ public class ClientHandler implements Runnable {
 		} catch (Exception e) {
 			System.out.println("Some exception: " + e.getMessage());
 		} finally {
-			/**
-			 * try { //socket.close(); System.out.println("Thread closed"); } catch
-			 * (IOException e) {
-			 * 
-			 * }
-			 */
+			
 		}
 
 	}
 }
-

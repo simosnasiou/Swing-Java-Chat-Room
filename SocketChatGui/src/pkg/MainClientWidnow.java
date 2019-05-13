@@ -3,11 +3,6 @@ package pkg;
 import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.net.Socket;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.io.IOException;
-import java.io.PrintWriter;
 
 import javax.swing.JFrame;
 import javax.swing.JTextArea;
@@ -28,24 +23,14 @@ public class MainClientWidnow {
 	private JTextField sendField;
 
 	/**
-	 * Server communication objects
+	 * Sever connector object that handles all communication
 	 */
-	Socket socket;
-	Scanner input;
-	PrintWriter output;
-
-	/**
-	 * Create the application.
-	 */
-	public MainClientWidnow() {
-		initializeConnection();
-		initialize();
-	}
+	ServerConnector sC;
 
 	/**
 	 * Initialize the contents of the frame.
 	 */
-	private void initialize() {
+	private void initializeView() {
 		// initialize the components
 		chatFrame = new JFrame();
 		chatFrame.setTitle("ChatWindow");
@@ -58,7 +43,7 @@ public class MainClientWidnow {
 		textArea.setEditable(false);
 		textArea.setBounds(10, 45, 399, 205);
 		textArea.setAutoscrolls(true);
-		textArea.setText("Waiting For connection");
+		textArea.setText(" - Waiting For connection... -");
 
 		scrollPane = new JScrollPane(textArea);
 		scrollPane.setBounds(10, 11, 400, 217);
@@ -69,33 +54,32 @@ public class MainClientWidnow {
 		chatFrame.getContentPane().add(sendBtn);
 
 		sendField = new JTextField();
-		sendField.setBounds(10, 240, 301, 20);
+		sendField.setBounds(10, 240, 301, 22);
 		chatFrame.getContentPane().add(sendField);
 		sendField.setColumns(10);
 	}
 
 	/**
-	 * Initialize the connection through the socket etc
+	 * Atemting a connection
 	 */
-	public void initializeConnection() {
-		try {
-			this.socket = new Socket("127.0.0.1", 59090);
-			input = new Scanner(socket.getInputStream());
-			output = new PrintWriter(socket.getOutputStream(), true);
-		} catch (Exception e) {
-			// exile do someting!
+	public boolean startConnection() {
+		// Make a new ServerConnector to deal with communication
+		boolean result = false;
+		sC = new ServerConnector("127.0.0.1", 59090);
+		if (sC.isConnected()) {
+			sC.setUsername("o mpampa sas koproskyla");
+			textArea.setText(" - Connected to the ChatRoom -");
+			// Send button functionality
+			sendBtn.addActionListener(new ActionListener() {
+				@Override
+				public void actionPerformed(ActionEvent e) {
+					sC.sendMsg(sendField.getText());
+					sendField.setText("");
+				}
+			});
+			result = true;
 		}
-	}
-
-	// overloading with arguments
-	public void initializeConnection(String serverIP, int socketNumber) {
-		try {
-			this.socket = new Socket(serverIP, socketNumber);
-			input = new Scanner(socket.getInputStream());
-			output = new PrintWriter(socket.getOutputStream(), true);
-		} catch (Exception e) {
-			// exile do someting!
-		}
+		return result;
 	}
 
 	/**
@@ -103,34 +87,30 @@ public class MainClientWidnow {
 	 * after initialization
 	 */
 	public void runRoutine() {
-		// button click function send msg clear fields etc
-		sendBtn.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				output.println(sendField.getText());
-				sendField.setText("");
-			}
-		});
-
 		// Timer function to update the chat regularly
 		ActionListener updateChat = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				try {
-					int inputSize = socket.getInputStream().available();// not blocking
-					if (inputSize != 0) {
-						String receivedText = input.nextLine();
-						textArea.append(receivedText);
+				if (sC.isConnected()) {
+					//this happens when the connection is still well and running
+					if (sC.hasNewChatContents()) {
+						textArea.append("\n" + sC.getChatContents());
 					}
-				} catch (NoSuchElementException | IOException ex) {
-					System.out.println("No more client input");
+				} else {
+					//this happens when we are not connected (any more)
+					textArea.setText(" - Connection Lost SadFace - ");
 				}
 			}
-
 		};
-
 		chatUpdater = new Timer(500, updateChat);
 		chatUpdater.start();
 
+	}
+
+	/**
+	 * Initialize the components in the constructor
+	 */
+	public MainClientWidnow() {
+		initializeView();
 	}
 
 	/**
@@ -142,6 +122,7 @@ public class MainClientWidnow {
 				try {
 					MainClientWidnow window = new MainClientWidnow();
 					window.chatFrame.setVisible(true);
+					window.startConnection();
 					window.runRoutine();
 				} catch (Exception e) {
 					e.printStackTrace();
