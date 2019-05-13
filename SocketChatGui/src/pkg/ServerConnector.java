@@ -31,7 +31,7 @@ public class ServerConnector {
 	public boolean isConnected() {
 		boolean isit = false;
 		try {
-			if (!socket.isClosed()) {
+			if (!socket.isClosed() && socket.isConnected()) {
 				isit = true;
 			}
 		} catch (Exception e) {
@@ -56,13 +56,15 @@ public class ServerConnector {
 			// exile do someting!
 		}
 	}
-
+	
+	//add desctiption
 	public void sendMsg(String stringToSend) {
 		if (!socket.isClosed()) {
 			output.println(username + " : " + stringToSend);
 		}
 	}
 
+	//add decription
 	public String getChatContents() {
 		String resultText = null;
 		try {
