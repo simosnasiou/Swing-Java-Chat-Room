@@ -1,4 +1,4 @@
-#Swing - Java - Chat Room
+# Swing - Java - Chat Room
 ### This is another training project aiming to help me get better
 ### Includes Server and Client parts. Works with multiple clients
 #### Utilises among else Threads, Socket Programming, Swing Gui etc.
