@@ -58,7 +58,7 @@ public class MainClientWidnow {
 		textArea.setEditable(false);
 		textArea.setBounds(10, 45, 399, 205);
 		textArea.setAutoscrolls(true);
-		textArea.setText("let's see if it works\n");
+		textArea.setText("Waiting For connection");
 
 		scrollPane = new JScrollPane(textArea);
 		scrollPane.setBounds(10, 11, 400, 217);
