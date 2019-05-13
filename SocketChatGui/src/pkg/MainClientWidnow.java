@@ -4,6 +4,7 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.Socket;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.io.PrintWriter;
 
@@ -27,6 +28,7 @@ public class MainClientWidnow {
 	private JButton send_btn;
 	private JTextField send_field;
 
+	private int i;
 	/**
 	 * Server communication objects
 	 */
@@ -93,30 +95,16 @@ public class MainClientWidnow {
 	public void runRoutine() {
 
 		// buton click funciton
-		send_btn.addMouseListener(new MouseAdapter() {
+		send_btn.addActionListener(new ActionListener() {
 			@Override
-			public void mouseClicked(MouseEvent arg0) {
-				if (send_field.getText().equals("")) {
-					output.println(send_field.getText());
-					send_field.setText("");
-				}
+			public void actionPerformed(ActionEvent e) {
+				output.println(send_field.getText());
+				textArea.setText(send_field.getText());
+				send_field.setText("");
 			}
 		});
 
-		// Regularly updating the chat field
-		ActionListener updateChat = new ActionListener() {
-			public void actionPerformed(ActionEvent evt) {
-				try {
-					if (input.hasNextLine()) {
-						textArea.append(input.nextLine());
-					}
-				} catch (Exception e) {
-					textArea.setText(e.getMessage());
-				}
-			}
-		};
-		timer = new Timer(1000, updateChat);
-		timer.start();
+		// Regularly updating the chat field - but other tests for now
 	}
 
 	/**

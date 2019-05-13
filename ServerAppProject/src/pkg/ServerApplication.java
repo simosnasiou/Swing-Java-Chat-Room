@@ -2,15 +2,14 @@ package pkg;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ExecutorService;
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.Set;
 import javax.swing.Timer;
@@ -36,14 +35,16 @@ public class ServerApplication {
 
 		// input (reading of this client's messages to the server)
 		private Scanner input;
-		private BufferedReader input2;
+
+		// The timer
+		Timer tt;
 
 		// Constructor - pass the socket for this connection
 		public ClientHandler(Socket socket) {
 			this.socket = socket;
 		}
 
-		// Main execution for the different server functions
+		// Main execution for the different server functions for each each thread
 		@Override
 		public void run() {
 			try {
@@ -52,31 +53,27 @@ public class ServerApplication {
 				output = new PrintWriter(socket.getOutputStream(), true);
 				input = new Scanner(socket.getInputStream());
 
-				input2 = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-
 				// add this one to the printing set
 				client_writers.add(output);
 
 				// repeatedly check for messages and rebroadcast - change the implementation
-				// from while true to someting else
 				ActionListener sendStuff = new ActionListener() {
 					public void actionPerformed(ActionEvent evt) {
-						// System.out.print(input.nextLine());
 						try {
-							if (input2.ready()) {
-								// String received_msg = input.nextLine();
-								// output.println(received_msg);
-								output.println("so cold\n");
-								output.println(input2.readLine());
+							int x = socket.getInputStream().available();//not blocking
+							if (x != 0) {
+								String ss = input.nextLine();
+								System.out.println(ss);
 							}
-
-						} catch (IOException e) {
-							System.out.print(e.getMessage());
+						} catch (NoSuchElementException | IOException ex) {
+							System.out.println("No more client input");
 						}
 					}
+
 				};
-				Timer tt = new Timer(500, sendStuff);
+				tt = new Timer(500, sendStuff);
 				tt.start();
+
 			} catch (Exception e) {
 				System.out.println("Some exception: " + e.getMessage());
 			} finally {
