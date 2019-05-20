@@ -116,7 +116,7 @@ public class MainClientWidnow {
 	public void startConnection() {
 		// Make a new ServerConnector to deal with communication using the input data
 		sC = new ServerConnector(ipField.getText(), Integer.parseInt(portField.getText()));
-		if (sC.isConnected()) {
+		if (isConnected) {
 			sC.setUsername(nameField.getText());
 			textArea.setText(" - Connected to the Chat Room -");			
 			nameField.setEditable(false);
@@ -126,6 +126,8 @@ public class MainClientWidnow {
 			connectBtn.setEnabled(false);
 			connectBtn.setText("Connected");
 			
+			//Start periodic running functionality
+			runRoutine();
 			// Send button functionality
 			sendBtn.addActionListener(new ActionListener() {
 				@Override
@@ -136,7 +138,7 @@ public class MainClientWidnow {
 			});
 
 		} else {
-			textArea.setText(" -Connection with the chat server failed. Trya again later - ");
+			textArea.setText(" - Connection with the chat server failed. Try again later - ");
 			isConnected=false;
 		}
 	}
@@ -154,10 +156,13 @@ public class MainClientWidnow {
 					if (sC.hasNewChatContents()) {
 						textArea.append("\n" + sC.getChatContents());					
 					}
+				} else {
+					//not expected to ever run in the current form
+					textArea.setText("Some problem occured while updating chat conntents");
 				}
 			}
 		};
-		Timer chatUpdater = new Timer(500, updateChat);
+		Timer chatUpdater = new Timer(200, updateChat);
 		chatUpdater.start();
 	}
 
@@ -183,7 +188,6 @@ public class MainClientWidnow {
 				try {
 					MainClientWidnow window = new MainClientWidnow();
 					window.chatFrame.setVisible(true);
-					window.runRoutine();
 				} catch (Exception e) {
 					e.printStackTrace();
 				}

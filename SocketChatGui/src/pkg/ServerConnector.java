@@ -26,28 +26,17 @@ public class ServerConnector {
 	private String username = "anonymous";
 
 	/**
-	 * Connection Status
+	 * setter for the username with filters
 	 */
-	public boolean isConnected() {
-		boolean isit = false;
-		try {
-			if (!socket.isClosed() && socket.isConnected()) {
-				isit = true;
-			}
-		} catch (Exception e) {
-			isit = false;
-		}
-		return isit;
-	}
-
-	// seting username
 	public void setUsername(String usrnm) {
 		usrnm =usrnm.trim();
 		usrnm = usrnm.replaceAll("\\s", "").substring(0, Math.min(10,usrnm.length()));
 		this.username = usrnm;
 	}
 
-	// Initialize the socket (rather try to) and the i/o streams
+	/**
+	 *  Initialize the socket (rather try to) and the i/o streams
+	 */
 	public void initializeConnection(String serverIP, int socketNumber) {
 		try {
 			this.socket = new Socket(serverIP, socketNumber);
@@ -58,14 +47,19 @@ public class ServerConnector {
 		}
 	}
 	
-	//add desctiption
+
+	/**
+	 *  Sending the server to print
+	 */
 	public void sendMsg(String stringToSend) {
 		if (!socket.isClosed()) {
 			output.println(username + " : " + stringToSend);
 		}
 	}
 
-	//add decription
+	/**
+	 * Getting the contents of the chat from the server
+	 */
 	public String getChatContents() {
 		String resultText = null;
 		try {
@@ -76,7 +70,10 @@ public class ServerConnector {
 		return resultText;
 	}
 
-	// weather chat has new to messages to show
+
+	/**
+	 * Show weather the chat has new input to be print
+	 */
 	public boolean hasNewChatContents() {
 		boolean value = false;
 		try {
@@ -90,7 +87,7 @@ public class ServerConnector {
 	}
 
 	/**
-	 * Constructor.
+	 * Constructor
 	 */
 	public ServerConnector(String serverIP, int socketNumber) {
 		initializeConnection(serverIP, socketNumber);

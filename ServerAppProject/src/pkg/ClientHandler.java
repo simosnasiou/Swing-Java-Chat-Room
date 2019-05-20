@@ -12,29 +12,39 @@ import javax.swing.Timer;
 
 /**
  * 
- * @author pope_ This is the class that the server uses to handle each client in
- *         a separate thread
+ * @author pope_ 
+ *     This is the class that the server uses to handle each client in
+ *     a separate thread
  */
 public class ClientHandler implements Runnable {
 
-	// The socket of for the server connection
+	/**
+	 * The socket of for the connection to the client
+	 */
 	private Socket socket;
 
-	// output (sending messages to this client-thread)
-	
-
-	// input (reading of this client's messages to the server)
+	//
+	/**
+	 *  input (reading of each client's messages for the server) output is implemented locally in the appropriate function
+	 */
 	private Scanner input;
 
-	// The timer
+	/**
+	 * The timer for repeatedly executing the main server functionality (sendStuff function)
+	 */
 	Timer tt;
 
-	// Constructor - pass the socket for this connection
+	/**
+	 * Constructor - pass the socket for this connection
+	 */
 	public ClientHandler(Socket socket) {
 		this.socket = socket;
 	}
 
-	// Main execution for the different server functions for each each thread
+	
+	/**
+	 *Main execution for the different server functions for each each thread 
+	 */
 	@Override
 	public void run() {
 		try {
@@ -63,7 +73,7 @@ public class ClientHandler implements Runnable {
 				}
 
 			};
-			tt = new Timer(500, sendStuff);
+			tt = new Timer(100, sendStuff);
 			tt.start();
 
 		} catch (Exception e) {

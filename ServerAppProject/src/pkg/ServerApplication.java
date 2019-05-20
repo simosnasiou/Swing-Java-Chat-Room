@@ -15,7 +15,9 @@ import java.util.Set;
 
 public class ServerApplication {
 
-	// Set of print writers used to write messages to every client
+	/**
+	 * Set of print writers used to write messages to every client
+	 */
 	protected static final Set<PrintWriter> clientWriters = new HashSet<>();
 
 	public static void main(String[] args) throws IOException {
