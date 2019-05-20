@@ -105,6 +105,7 @@ public class MainClientWidnow {
 		portField.setColumns(10);
 		
 		connectBtn = new JButton("Connect!");
+		connectBtn.setToolTipText("Press to connect to the server");
 		connectBtn.setBounds(420, 205, 89, 23);
 		chatFrame.getContentPane().add(connectBtn);
 	}
@@ -117,12 +118,13 @@ public class MainClientWidnow {
 		sC = new ServerConnector(ipField.getText(), Integer.parseInt(portField.getText()));
 		if (sC.isConnected()) {
 			sC.setUsername(nameField.getText());
-			textArea.setText(" - Connected to the ChatRoom -");			
+			textArea.setText(" - Connected to the Chat Room -");			
 			nameField.setEditable(false);
 			isConnected =true;
 			ipField.setEditable(false);
 			portField.setEditable(false);
 			connectBtn.setEnabled(false);
+			connectBtn.setText("Connected");
 			
 			// Send button functionality
 			sendBtn.addActionListener(new ActionListener() {
@@ -130,11 +132,11 @@ public class MainClientWidnow {
 				public void actionPerformed(ActionEvent e) {
 					sC.sendMsg(sendField.getText());
 					sendField.setText("");
-					portField.setText("it works");
 				}
 			});
 
 		} else {
+			textArea.setText(" -Connection with the chat server failed. Trya again later - ");
 			isConnected=false;
 		}
 	}
@@ -152,9 +154,6 @@ public class MainClientWidnow {
 					if (sC.hasNewChatContents()) {
 						textArea.append("\n" + sC.getChatContents());					
 					}
-				} else {
-					//this happens when we are not connected (any more)
-					textArea.setText(" - Connection Lost SadFace - ");
 				}
 			}
 		};
