@@ -26,7 +26,7 @@ public class ServerConnector {
 	private String username = "anonymous";
 
 	/**
-	 * setter for the username with filters
+	 * setter for the username with restriction filters
 	 */
 	public void setUsername(String usrnm) {
 		usrnm =usrnm.trim();
@@ -37,14 +37,16 @@ public class ServerConnector {
 	/**
 	 *  Initialize the socket (rather try to) and the i/o streams
 	 */
-	public void initializeConnection(String serverIP, int socketNumber) {
+	public boolean initializeConnection(String serverIP, int socketNumber) {
+		boolean result=true;
 		try {
 			this.socket = new Socket(serverIP, socketNumber);
 			this.input = new Scanner(socket.getInputStream());
 			this.output = new PrintWriter(socket.getOutputStream(), true);
 		} catch (Exception e) {
-			// exile do someting!
+			result =false;
 		}
+		return result;
 	}
 	
 
@@ -86,10 +88,4 @@ public class ServerConnector {
 		return value;
 	}
 
-	/**
-	 * Constructor
-	 */
-	public ServerConnector(String serverIP, int socketNumber) {
-		initializeConnection(serverIP, socketNumber);
-	}
 }

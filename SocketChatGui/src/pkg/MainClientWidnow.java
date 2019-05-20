@@ -44,7 +44,7 @@ public class MainClientWidnow {
 		// initialize the components
 		chatFrame = new JFrame();
 		chatFrame.setTitle("ChatWindow");
-		chatFrame.setBounds(100, 100, 530, 299);
+		chatFrame.setBounds(100, 100, 551, 315);
 		chatFrame.setResizable(false);
 		chatFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		chatFrame.getContentPane().setLayout(null);
@@ -104,10 +104,13 @@ public class MainClientWidnow {
 		chatFrame.getContentPane().add(portField);
 		portField.setColumns(10);
 		
-		connectBtn = new JButton("Connect!");
+		connectBtn = new JButton("Connect !");
 		connectBtn.setToolTipText("Press to connect to the server");
-		connectBtn.setBounds(420, 205, 89, 23);
+		connectBtn.setBounds(420, 197, 100, 31);
 		chatFrame.getContentPane().add(connectBtn);
+		
+		//add Enter button functionality
+		chatFrame.getRootPane().setDefaultButton(sendBtn);
 	}
 
 	/**
@@ -115,7 +118,8 @@ public class MainClientWidnow {
 	 */
 	public void startConnection() {
 		// Make a new ServerConnector to deal with communication using the input data
-		sC = new ServerConnector(ipField.getText(), Integer.parseInt(portField.getText()));
+		sC = new ServerConnector();
+		isConnected=sC.initializeConnection(ipField.getText(), Integer.parseInt(portField.getText()));
 		if (isConnected) {
 			sC.setUsername(nameField.getText());
 			textArea.setText(" - Connected to the Chat Room -");			
@@ -139,7 +143,8 @@ public class MainClientWidnow {
 
 		} else {
 			textArea.setText(" - Connection with the chat server failed. Try again later - ");
-			isConnected=false;
+			//Assign null to eventually free resources
+			sC=null;
 		}
 	}
 
