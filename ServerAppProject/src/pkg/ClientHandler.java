@@ -17,11 +17,11 @@ import javax.swing.Timer;
  */
 public class ClientHandler implements Runnable {
 
-	// The socket of for the server connection;
+	// The socket of for the server connection
 	private Socket socket;
 
 	// output (sending messages to this client-thread)
-	private PrintWriter output;
+	
 
 	// input (reading of this client's messages to the server)
 	private Scanner input;
@@ -40,7 +40,7 @@ public class ClientHandler implements Runnable {
 		try {
 			System.out.println("- New client connected - ");
 			// in-out objects initialization
-			output = new PrintWriter(socket.getOutputStream(), true);
+			PrintWriter output = new PrintWriter(socket.getOutputStream(), true);
 			input = new Scanner(socket.getInputStream());
 
 			// add this one to the printing set
@@ -68,9 +68,6 @@ public class ClientHandler implements Runnable {
 
 		} catch (Exception e) {
 			System.out.println("Some exception: " + e.getMessage());
-		} finally {
-			
 		}
-
 	}
 }

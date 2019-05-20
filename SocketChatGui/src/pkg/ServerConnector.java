@@ -42,7 +42,7 @@ public class ServerConnector {
 
 	// seting username
 	public void setUsername(String usrnm) {
-		usrnm = usrnm.trim().replaceAll("\\s", "").substring(0,10);
+		//usrnm = usrnm.trim().replaceAll("\\s", "").substring(0,10);
 		this.username = usrnm;
 	}
 

@@ -16,7 +16,7 @@ import java.util.Set;
 public class ServerApplication {
 
 	// Set of print writers used to write messages to every client
-	public static Set<PrintWriter> clientWriters = new HashSet<>();
+	protected static final Set<PrintWriter> clientWriters = new HashSet<>();
 
 	public static void main(String[] args) throws IOException {
 		// trying to create the server
@@ -26,11 +26,11 @@ public class ServerApplication {
 			System.out.println("Server Running listening on port:" + listener.getLocalPort());
 
 			// The pool of threads- clients of fixed size
-			ExecutorService thread_pool = Executors.newFixedThreadPool(15);
+			ExecutorService threadPool = Executors.newFixedThreadPool(15);
 
 			// Accept the clients that request connection
 			while (true) {
-				thread_pool.execute(new ClientHandler(listener.accept()));
+				threadPool.execute(new ClientHandler(listener.accept()));
 			}
 		}
 	}

@@ -10,6 +10,8 @@ import javax.swing.Timer;
 import javax.swing.JScrollPane;
 import javax.swing.JButton;
 import javax.swing.JTextField;
+import javax.swing.JLabel;
+import java.awt.Font;
 
 public class MainClientWidnow {
 	/**
@@ -17,15 +19,23 @@ public class MainClientWidnow {
 	 */
 	private JFrame chatFrame;
 	private JTextArea textArea;
-	private Timer chatUpdater;
 	private JScrollPane scrollPane;
 	private JButton sendBtn;
 	private JTextField sendField;
+	private JTextField nameField;
+	private JTextField ipField;
+	private JTextField portField;
+	private JLabel portLabel;
+	JButton connectBtn;
 
 	/**
 	 * Sever connector object that handles all communication
+	 * Also a variable for connection Status
 	 */
 	ServerConnector sC;
+	boolean isConnected=false; 
+
+
 
 	/**
 	 * Initialize the contents of the frame.
@@ -34,7 +44,7 @@ public class MainClientWidnow {
 		// initialize the components
 		chatFrame = new JFrame();
 		chatFrame.setTitle("ChatWindow");
-		chatFrame.setBounds(100, 100, 450, 321);
+		chatFrame.setBounds(100, 100, 530, 299);
 		chatFrame.setResizable(false);
 		chatFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		chatFrame.getContentPane().setLayout(null);
@@ -57,29 +67,76 @@ public class MainClientWidnow {
 		sendField.setBounds(10, 240, 301, 22);
 		chatFrame.getContentPane().add(sendField);
 		sendField.setColumns(10);
+		
+		JLabel nameLabel = new JLabel("User Name");
+		nameLabel.setBounds(420, 17, 81, 14);
+		chatFrame.getContentPane().add(nameLabel);
+		nameLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		JLabel ipLabel = new JLabel("Server I.P");
+		ipLabel.setBounds(420, 73, 81, 14);
+		chatFrame.getContentPane().add(ipLabel);
+		ipLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		
+		portLabel = new JLabel("Port");
+		portLabel.setFont(new Font("Tahoma", Font.BOLD, 11));
+		portLabel.setBounds(420, 129, 81, 14);
+		chatFrame.getContentPane().add(portLabel);
+		
+		nameField = new JTextField();
+		nameField.setToolTipText("nickname other users see");
+		nameField.setText("anonymous");
+		nameField.setBounds(420, 42, 86, 20);
+		chatFrame.getContentPane().add(nameField);
+		nameField.setColumns(10);
+		
+		ipField = new JTextField();
+		ipField.setText("127.0.0.1");
+		ipField.setToolTipText("ip of the server to connceto to");
+		ipField.setBounds(420, 98, 86, 20);
+		chatFrame.getContentPane().add(ipField);
+		ipField.setColumns(10);
+		
+		portField = new JTextField();
+		portField.setText("59090");
+		portField.setToolTipText("server port");
+		portField.setBounds(420, 154, 86, 20);
+		chatFrame.getContentPane().add(portField);
+		portField.setColumns(10);
+		
+		connectBtn = new JButton("Connect!");
+		connectBtn.setBounds(420, 205, 89, 23);
+		chatFrame.getContentPane().add(connectBtn);
 	}
 
 	/**
-	 * Atemting a connection
+	 * Attempting a connection
 	 */
-	public boolean startConnection() {
-		// Make a new ServerConnector to deal with communication
-		boolean result = false;
-		sC = new ServerConnector("127.0.0.1", 59090);
+	public void startConnection() {
+		// Make a new ServerConnector to deal with communication using the input data
+		sC = new ServerConnector(ipField.getText(), Integer.parseInt(portField.getText()));
 		if (sC.isConnected()) {
-			sC.setUsername("o mpampa sas koproskyla");
-			textArea.setText(" - Connected to the ChatRoom -");
+			sC.setUsername(nameField.getText());
+			textArea.setText(" - Connected to the ChatRoom -");			
+			nameField.setEditable(false);
+			isConnected =true;
+			ipField.setEditable(false);
+			portField.setEditable(false);
+			connectBtn.setEnabled(false);
+			
 			// Send button functionality
 			sendBtn.addActionListener(new ActionListener() {
 				@Override
 				public void actionPerformed(ActionEvent e) {
 					sC.sendMsg(sendField.getText());
 					sendField.setText("");
+					portField.setText("it works");
 				}
 			});
-			result = true;
+
+		} else {
+			isConnected=false;
 		}
-		return result;
 	}
 
 	/**
@@ -90,10 +147,10 @@ public class MainClientWidnow {
 		// Timer function to update the chat regularly
 		ActionListener updateChat = new ActionListener() {
 			public void actionPerformed(ActionEvent evt) {
-				if (sC.isConnected()) {
+				if (isConnected) {
 					//this happens when the connection is still well and running
 					if (sC.hasNewChatContents()) {
-						textArea.append("\n" + sC.getChatContents());
+						textArea.append("\n" + sC.getChatContents());					
 					}
 				} else {
 					//this happens when we are not connected (any more)
@@ -101,9 +158,8 @@ public class MainClientWidnow {
 				}
 			}
 		};
-		chatUpdater = new Timer(500, updateChat);
+		Timer chatUpdater = new Timer(500, updateChat);
 		chatUpdater.start();
-
 	}
 
 	/**
@@ -111,6 +167,12 @@ public class MainClientWidnow {
 	 */
 	public MainClientWidnow() {
 		initializeView();
+		connectBtn.addActionListener(new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				startConnection();
+			}
+		});
 	}
 
 	/**
@@ -122,7 +184,6 @@ public class MainClientWidnow {
 				try {
 					MainClientWidnow window = new MainClientWidnow();
 					window.chatFrame.setVisible(true);
-					window.startConnection();
 					window.runRoutine();
 				} catch (Exception e) {
 					e.printStackTrace();
